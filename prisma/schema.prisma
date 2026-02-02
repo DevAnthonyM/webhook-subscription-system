@@ -1,0 +1,103 @@
+generator client {
+    provider = "prisma-client-js"
+}
+
+datasource db {
+    provider = "postgresql"
+    url      = env("DATABASE_URL")
+}
+
+model User {
+    id         String   @id @default(uuid())
+    email      String   @unique
+    name       String?
+    created_at DateTime @default(now())
+    updated_at DateTime @updatedAt
+
+    subscriptions Subscription[]
+    payments      Payment[]
+
+    @@index([email])
+}
+
+model Subscription {
+    id         String             @id @default(uuid())
+    user_id    String
+    plan_type  String
+    status     SubscriptionStatus @default(PENDING)
+    started_at DateTime?
+    expires_at DateTime?
+    created_at DateTime           @default(now())
+    updated_at DateTime           @updatedAt
+
+    user User @relation(fields: [user_id], references: [id], onDelete: Cascade)
+
+    @@unique([user_id, plan_type])
+    @@index([user_id])
+    @@index([status])
+    @@index([expires_at])
+}
+
+enum SubscriptionStatus {
+    PENDING
+    ACTIVE
+    EXPIRED
+    CANCELLED
+}
+
+model Payment {
+    id                  String        @id @default(uuid())
+    user_id             String
+    external_payment_id String        @unique
+    amount              Int
+    currency            String        @default("USD")
+    status              PaymentStatus @default(PENDING)
+    plan_type           String
+    payment_method      String?
+    provider            String?
+    metadata            Json?
+    created_at          DateTime      @default(now())
+    updated_at          DateTime      @updatedAt
+
+    user User @relation(fields: [user_id], references: [id], onDelete: Cascade)
+
+    @@index([external_payment_id])
+    @@index([user_id, created_at])
+    @@index([status])
+    @@index([created_at])
+}
+
+enum PaymentStatus {
+    PENDING
+    COMPLETED
+    FAILED
+    REFUNDED
+}
+
+model WebhookEvent {
+    id                  String        @id @default(uuid())
+    external_payment_id String
+    event_type          String
+    status              WebhookStatus @default(RECEIVED)
+    payload             Json
+    signature           String?
+    processing_error    String?
+    retry_count         Int           @default(0)
+    processed_at        DateTime?
+    created_at          DateTime      @default(now())
+    updated_at          DateTime      @updatedAt
+
+    @@unique([external_payment_id, event_type])
+    @@index([external_payment_id])
+    @@index([status])
+    @@index([created_at])
+    @@index([external_payment_id, status])
+}
+
+enum WebhookStatus {
+    RECEIVED
+    PROCESSING
+    PROCESSED
+    FAILED
+    DUPLICATE
+}

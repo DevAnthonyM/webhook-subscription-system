@@ -46,3 +46,8 @@ coverage/
 # Temporary files
 tmp/
 temp/
+docs/
+.vscode
+
+
+/generated/prisma
