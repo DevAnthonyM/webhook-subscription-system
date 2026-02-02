@@ -39,9 +39,9 @@ export class DatabaseService
   async onModuleInit() {
     try {
       await this.$connect();
-      this.logger.log('✅ Database connected successfully');
+      this.logger.log('Database connected successfully');
     } catch (error) {
-      this.logger.error('❌ Failed to connect to database', error);
+      this.logger.error('Failed to connect to database', error);
       throw error;
     }
   }
@@ -53,9 +53,9 @@ export class DatabaseService
   async onModuleDestroy() {
     try {
       await this.$disconnect();
-      this.logger.log('🔌 Database disconnected');
+      this.logger.log('Database disconnected');
     } catch (error) {
-      this.logger.error('❌ Error disconnecting from database', error);
+      this.logger.error('Error disconnecting from database', error);
     }
   }
 }
