@@ -28,8 +28,6 @@ build/
 *.db
 *.sqlite
 *.sqlite3
-prisma/migrations/*
-!prisma/migrations/.gitkeep
 
 # Logs
 logs/
@@ -47,7 +45,7 @@ coverage/
 tmp/
 temp/
 docs/
-.vscode
+prisma/
 
-
+# Generated Prisma
 /generated/prisma
